@@ -1,8 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+// Aliases must come before any usage
+using AssemblyService = Services.AssemblyReference;
 
 using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
+using Services;
 using Services.Abstractions;
 
 
@@ -24,7 +33,7 @@ namespace Store.G03.API
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IServiceManger,IServiceManger>();
-            builder.Services.AddAutoMapper(typeof(Persistence.AssemblyReference).Assembly);
+            builder.Services.AddAutoMapper(typeof(AssemblyService).Assembly);
 
             var app = builder.Build();
 
