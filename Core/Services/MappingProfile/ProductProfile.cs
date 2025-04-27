@@ -13,7 +13,12 @@ namespace Services.MappingProfile
     {
         public ProductProfile()
         {
-            CreateMap<Products, ProductResultDto>().ForMember(P=> P.BrandName, o => o.MapFrom(s =>s.ProductBrand.Name));
+            CreateMap<Products, ProductResultDto>()
+                .ForMember(P => P.BrandName, o => o.MapFrom(s => s.ProductBrand.Name)).
+                ForMember(d => d.TypeName, o => o.MapFrom(s => s.ProductType.Name))
+                //.ForMember(d => d.PictureUrl , o => o.MapFrom(s=>$"https://localhost:7046/{s.PictureUrl}"))
+               .ForMember(d => d.PictureUrl , o=> o.MapFrom<PictureUrlReslover>())
+                ;
             CreateMap<ProductBrand, BrandResultDto>();
             CreateMap<ProductType, TypeResultDto>();
         }

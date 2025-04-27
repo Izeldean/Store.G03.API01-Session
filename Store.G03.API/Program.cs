@@ -13,6 +13,12 @@ using Persistence;
 using Persistence.Data;
 using Services;
 using Services.Abstractions;
+using Store.G03.API.MiddleWare;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.ErrorModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Store.G03.API.Extensions;
 
 
 namespace Store.G03.API
@@ -23,35 +29,56 @@ namespace Store.G03.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            ////Add service container
+            //builder.Services.RegisterAllServices(builder.Configuration);
 
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            //builder.Services.AddControllers();
+            //builder.Services.AddEndpointsApiExplorer();
+            //builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IServiceManger,IServiceManger>();
-            builder.Services.AddAutoMapper(typeof(AssemblyService).Assembly);
+            //builder.Services.AddInfrastructureServices(builder.Configuration);
+            //builder.Services.AddApplicationServices();
+
+
+            //builder.Services.AddDbContext<StoreDbContext>(options =>
+            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            //builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+            //builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //builder.Services.AddScoped<IServiceManger, ServiceManger>();
+            //builder.Services.AddAutoMapper(typeof(AssemblyService).Assembly);
+
+
+
+            //builder.Services.Configure<ApiBehaviorOptions>(
+            //    config =>
+            //    {
+            //        config.InvalidModelStateResponseFactory = (actionContext) =>
+            //        {
+            //            var errors = actionContext.ModelState.Where(m => m.Value.Errors.Any()).Select(
+            //                  m => new ValidationError()
+            //                  {
+            //                      Field = m.Key,
+            //                      Errors = m.Value.Errors.Select(errors => errors.ErrorMessage)
+            //                  }
+
+            //                  );
+
+            //            var response = new ValidationErrorResponse()
+            //            {
+            //                Errors = errors
+
+            //            };
+            //            return new BadRequestObjectResult("");
+            //        };
+            //    }
+
+            //    );
+            builder.Services.RegisterAllServices(builder.Configuration);
 
             var app = builder.Build();
-
-            #region Seeding
-            using var scope = app.Services.CreateScope();
-            var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-            await dbInitializer.InitializeAsync();
-            #endregion
-
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseAuthorization();
-            app.MapControllers();
+          await  app.ConfigureMiddlewares();
+  
             app.Run();
         }
     }
