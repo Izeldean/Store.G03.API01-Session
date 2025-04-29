@@ -1,13 +1,17 @@
 ﻿using Domain.Contracts;
 using Domain.Models.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Persistence;
 using Persistence.Identity;
 using Services;
+using Shared;
 using Shared.ErrorModels;
+using Microsoft.IdentityModel.Tokens;
 using Store.G03.API.MiddleWare;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Store.G03.API.Extensions
 {
@@ -18,6 +22,36 @@ namespace Store.G03.API.Extensions
             services.AddControllers();
             return services;
         }
+
+        private static IServiceCollection ConfigureJwtServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
+            services.AddAuthentication(
+                options => {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+                ).AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true,
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+
+                    };
+
+
+                });
+                 return services;
+        }
+
+
+
 
         private static IServiceCollection AddIdentityServices(this IServiceCollection services)
         {
@@ -76,6 +110,7 @@ namespace Store.G03.API.Extensions
             //--> used for media and pictures
             app.UseStaticFiles();
             app.UseHttpsRedirection();
+            app.UseAuthentication();    
             app.UseAuthorization();
             app.MapControllers();
             return app;
@@ -102,12 +137,12 @@ namespace Store.G03.API.Extensions
 
             services.AddBuiltInServices();
             services.AddSwaggerInServices();
-           
-            services.AddInfrastructureServices(configuration);
-            services.AddApplicationServices();
-            services.AddIdentityServices();
             services.ConfigureService();
+            services.AddInfrastructureServices(configuration);
+            services.AddIdentityServices();
+            services.AddApplicationServices(configuration);
 
+            services.ConfigureJwtServices(configuration);
 
             return services;
         }

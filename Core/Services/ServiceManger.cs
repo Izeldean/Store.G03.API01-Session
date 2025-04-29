@@ -2,7 +2,10 @@
 using Domain.Contracts;
 using Domain.Models.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Services.Abstractions;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +15,16 @@ using System.Threading.Tasks;
 namespace Services
 {
     public class ServiceManger(IUnitOfWork unitOfWork,IMapper mapper, IBasketRepsository basketRepsository
-        , ICacheRepository cacheRepository, UserManager<AppUser> userManger) : IServiceManger
+        , ICacheRepository cacheRepository, UserManager<AppUser> userManger,
+        IOptions<JwtOptions> options) : IServiceManger
     {
         public IProductService ProductService { get; }= new ProductService(unitOfWork, mapper);
        //IBasketService BasketService { get; } = new BasketService(basketRepsository , mapper);
         public IBasketService BasketService { get;  } = new BasketService(basketRepsository, mapper);
         public ICacheService CacheService { get; } = new CacheService(cacheRepository);
 
-        public IAuthService AuthService { get; } = new AuthService(userManger);
+        public IAuthService AuthService { get; } = new AuthService(userManger,options);
+
+        public IOrderService OrderService { get; } = new OrderService(mapper,basketRepsository,unitOfWork);
     }
 }

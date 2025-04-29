@@ -29,51 +29,6 @@ namespace Store.G03.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            ////Add service container
-            //builder.Services.RegisterAllServices(builder.Configuration);
-
-            //builder.Services.AddControllers();
-            //builder.Services.AddEndpointsApiExplorer();
-            //builder.Services.AddSwaggerGen();
-
-            //builder.Services.AddInfrastructureServices(builder.Configuration);
-            //builder.Services.AddApplicationServices();
-
-
-            //builder.Services.AddDbContext<StoreDbContext>(options =>
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            //builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            //builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            //builder.Services.AddScoped<IServiceManger, ServiceManger>();
-            //builder.Services.AddAutoMapper(typeof(AssemblyService).Assembly);
-
-
-
-            //builder.Services.Configure<ApiBehaviorOptions>(
-            //    config =>
-            //    {
-            //        config.InvalidModelStateResponseFactory = (actionContext) =>
-            //        {
-            //            var errors = actionContext.ModelState.Where(m => m.Value.Errors.Any()).Select(
-            //                  m => new ValidationError()
-            //                  {
-            //                      Field = m.Key,
-            //                      Errors = m.Value.Errors.Select(errors => errors.ErrorMessage)
-            //                  }
-
-            //                  );
-
-            //            var response = new ValidationErrorResponse()
-            //            {
-            //                Errors = errors
-
-            //            };
-            //            return new BadRequestObjectResult("");
-            //        };
-            //    }
-
-            //    );
             builder.Services.RegisterAllServices(builder.Configuration);
 
             var app = builder.Build();
